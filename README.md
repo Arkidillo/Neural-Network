@@ -1,2 +1,2 @@
 # Neural-Network
-Neural network built in something.
+Neural network built in something to beat reCaptcha.
