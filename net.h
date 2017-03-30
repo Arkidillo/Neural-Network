@@ -5,8 +5,9 @@
 
 class Net {
 	public:
-		Node* inputs;
-		Node* outputs;
+		InNode* inputs;
+		HiddenNode* hidden;
+		OutNode* outputs;
 		Net();
 }
 
