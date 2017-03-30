@@ -1,6 +1,6 @@
 #include "node.h"
 
-Edge::Edge(int w, Edge* s, Edge* e){
+Edge::Edge(int w, Node* s, Node* e){
 	this->weight = w;
 	this->start = s;
 	this->end = e;
