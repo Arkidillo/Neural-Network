@@ -18,14 +18,18 @@ double sigmoid(double x);
 int main(){
 
 
-	char encryptedText[10];
-	cout << "Enter an encrypted word up to 10 characters:";
-	cin >> encryptedText;
+	char plainText[10];
+	cout << "Enter plain text up to 10 characters:";
+	cin >> plainText;
 
+   char ecryptedText[10];
+   cout << "Enter the encrypted text:";
+   cin >> ecryptedText;
 	srand(time(NULL));
 
 	/* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
 	int inputs[7];
+   int target[7];
 	/* syn0 are the edges connecting the input nodes and the hidden layer */
 	double syn0[7][10];
 	double hiddenNode[10];
@@ -33,6 +37,7 @@ int main(){
 	double syn1[10][7];
 	/* The ouputs will be doubles, but will be cast to ints as the output, to get the ascii value */
 	double outNode[7];
+   double finalError[7];
 
 	/* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
 	char mask;
@@ -51,7 +56,8 @@ int main(){
 		/* For each input character, we need to mask out the bits to see what inputs will be on or off */
 		mask = 1;
 		for (int j = 0; j < 7; j++){	
-			inputs[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
+			inputs[j] = (plainText[i] & mask) == 0 ? 0 : 1;
+         target[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
 			mask = mask << 1;	//Shift mask over 1 to check for each bit 
 		}
 
@@ -62,6 +68,9 @@ int main(){
 			for (int k = 0; k < 7; k++){
 				hiddenNode[j] += inputs[k] * syn0[k][j];
 			}
+         
+         /* Apply sigmoid function to hiddenlayer sums */
+         hiddenNode[j] = sigmoid(hiddenNode[j]);
 		}
 
 		/* Iterates to find outputs */
@@ -71,12 +80,16 @@ int main(){
 				outNode[j] += hiddenNode[k] * syn1[k][j];
 			}
 		}
-
+      
+      /* Outputs are now calculated by this point. We now need to check against the target */
+      for (int j = 0; j < 7; j++){
+         finalError[j] = target[j] - outNode[j];
+      }
 	}
 	return 0;
 
 }
 
 double sigmoid(double x){
-	
+	return 1/(1 + pow(2.71828183, -1*x);
 }
