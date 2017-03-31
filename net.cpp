@@ -8,9 +8,6 @@
 using namespace std;
 
 /** 
- *	TODO: Modularize code
- *	TODO: Ask user for training/ using mode.
- *	TODO: Ask user for num_gen
  *	TODO: Save weights to a file
  *	TODO: Populate shorter string with spaces to be same length
  */
@@ -21,7 +18,10 @@ using namespace std;
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
-#define NUM_GEN 1000000
+/* 0 if in using, 1 if in training */
+int userMode;
+
+int NUM_GEN;
 
 /* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
 int inputs[NUM_IN];
@@ -44,128 +44,58 @@ char outString[MAX_CHAR];
 double sigmoid(double x);
 double errorSigmoid(double x);
 void printNet();
+void mainLoop();
 int getUserMode();
 void init();
+void setUpInputs(int i);
+void calculateOutputs();
+void backPropagation();
+void showResult();
+bool checkResult(int currentGen);
 
 int main(){
-	
-	/* Asks the user what mode they would like to use, training or using */
-	getUserMode();
-	/* Gets user input, initializes the synapses to random values */
-	init();
 
-	/* Loop to repeat for each generation */
-	for (int z = 0; z < NUM_GEN; z++){
-	/* Main loop that goes through each character at a time. */
-	for (int i = 0; i < max((int)strlen(encryptedText), (int)strlen(plainText)); i++){
+	/* Total loop that will repeatedly ask the user whether they want training or using, so they can train the net, then attempt to use it for another problem */
+	while (1){
+		/* Asks the user what mode they would like to use, training or using */
+		userMode = getUserMode();
+		/* Gets user input, initializes the synapses to random values */
+		init();
 
-		/********** SET UP **********/
-
-		/* For each input character, we need to mask out the bits to see what inputs will be on or off */
-		mask = 1;
-		for (int j = 0; j < NUM_IN; j++){	
-			inputs[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
-         	target[j] = (plainText[i] & mask) == 0 ? 0 : 1;
-			mask = mask << 1;	//Shift mask over 1 to check for each bit 
-		}
-
-		/* Reset hidden Nodes and output nodes to be all 0. */
-		for (int j = 0; j < NUM_HIDDEN; j++){
-			hiddenNode[j] = 0;
-		}
-		for (int j = 0; j < NUM_OUT; j++){
-			outNode[j] = 0;
-		}
-
-		/********** CALCULATE OUTPUTS **********/
-
-		/* Iterates through hidden layer */
-		for (int j = 0; j < NUM_HIDDEN; j++){
-			/* Iterates through all synapses connecting to the jth hidden node */
-			for (int k = 0; k < NUM_IN; k++){
-				hiddenNode[j] += inputs[k] * syn0[k][j];
-			}
-		}
-
-		/* Iterates to find outputs */
-		for (int j = 0; j < NUM_OUT; j++){
-			/* Iterates through all synapses connecting to the jth output node */
-			for (int k = 0; k < NUM_HIDDEN; k++){
-				outNode[j] += sigmoid(hiddenNode[k]) * syn1[k][j];
-			}
-		}
-      
-      	/********** BACK PROPAGATION **********/
-
-    	double finalError[NUM_OUT];
-      	/* Outputs are now calculated by this point. We now need to check against the target */
-      	for (int j = 0; j < NUM_OUT; j++){
-      		/* If the rounding of the output node (it gets rounded as per the output), equals the correct target, then say there is no error */
-      		if(target[j] == (int)floor(sigmoid(outNode[j]) + 0.5)){
-      			finalError[j] = 0;
-      		} else {
-        		finalError[j] = ((double)target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
-      		}
-      	}
-
-      	double newSyn1[NUM_HIDDEN][NUM_OUT];
-      	/* For every synapse, we must now change the weight to be finalError for its output node, times the hiddenLayer result and add that to the old synapse value. */
-      	for (int j = 0; j < NUM_OUT; j++){
-      		for (int k = 0; k < NUM_HIDDEN; k++){
-      			newSyn1[k][j] = syn1[k][j] + sigmoid(hiddenNode[k]) * finalError[j]; 
-      		}
-      	}
-
-      	double deltaHiddenSum[NUM_HIDDEN][NUM_OUT];
-      	/* Calculates the change in hidden sum by the last value */
-      	for (int j = 0; j < NUM_OUT; j++){
-      		for (int k = 0; k < NUM_HIDDEN; k++){
-      			deltaHiddenSum[k][j] = finalError[j] * syn1[k][j] * errorSigmoid(hiddenNode[k]);
-      		}
-      	}
-
-      	/* Set the new weights of the first synapses (input to hidden) */
-      	for (int j = 0; j < NUM_IN; j++){
-      		for (int k = 0; k < NUM_HIDDEN; k++){
-      			syn0[j][k] += deltaHiddenSum[k][j] * inputs[j];
-      		}
-      	}
-
-      	/* Now set syn1 to the new weights */
-      	for (int j = 0; j < NUM_HIDDEN; j++){
-      		for (int k = 0; k < NUM_OUT; k++){
-      			syn1[j][k] = newSyn1[j][k];
-      		}
-      	}
-
-      	/********** OUTPUT **********/
-
-      	int outValue = 0;
-      	/* Now, convert output back to ascii value */
-      	for (int j = 0; j < NUM_OUT; j++){
-      		/* We want the output value to be a 1 or 0, eventually it will converge to this. We use floor here to round 0.5 -> 1 and < 0.5 to 0. */
-      		outValue += (floor(sigmoid(outNode[j]) + 0.5) >= 1 ? 1 << j : 0);
-      	}
-      	//cout << (char)outValue;
-      	sprintf(outString, "%s%c", outString, (char)outValue);
+		/* Does the rest of the work of training/ using */
+		mainLoop();
 	}
-
-    cout << outString;
-    if(strcmp(outString, plainText) == 0){
-
-    	cout << endl << "DECRYPTION FINISHED AFTER: " << z << " GENERATIONS." << endl;
-    	return 0;
-    }
-    /* Reset outString to blank for the next iteration */
-	strcpy(outString, "");
-	cout << endl;
-}
 	return 0;
 
 }
 
+void mainLoop(){
+	/* Loop to repeat for each generation */
+	for (int z = 0; z < NUM_GEN; z++){
+		/* Main loop that goes through each character at a time. */
+		for (int i = 0; i < (int)strlen(encryptedText); i++){
+			
+			setUpInputs(i);
+			calculateOutputs();
+
+			if (userMode == 1){
+				backPropagation();
+			}
+	      
+	      	showResult();
+		}
+
+		/* If checkResult returns true, it means the output matched the target, and we should exit the loop as training is now completed */
+		if(userMode == 1){
+			if(checkResult(z)){
+				break;
+			}
+		}
+	}
+}
+
 int getUserMode(){
-	cout << "Enter 0 to enter use mode, enter 1 to enter training mode.";
+	cout << "Enter 0 to enter use mode, enter 1 to enter training mode: ";
 	int mode;
 	cin >> mode;
 
@@ -184,27 +114,180 @@ int getUserMode(){
 }
 
 void init(){
-	cin.getline(plainText, sizeof(plainText));
-	cout << "Enter plain text up to " << MAX_CHAR << " characters:";
-	cin.getline(plainText, sizeof(plainText));
+	
 
-	cout << "Enter the encrypted text:";
+
+	/* We only need the plain text for training mode. And we don't want to overwrite the current weights */
+	if (userMode == 1){
+		/* We only need to use the NUM_GEN in triaining, because in using, the output will always be the same because there is no weight change. Thus, we only need 1 GEN. */
+		cout << "Enter number of generations: " << endl;
+		cin >> NUM_GEN;
+		
+		/* Clears extraneous \n that has no been read in yet */
+		cin.getline(plainText, sizeof(plainText));
+		cout << "Enter plain text up to " << MAX_CHAR << " characters: ";
+		cin.getline(plainText, sizeof(plainText));
+
+		/* Set up weights for syn0 and syn1*/
+		for (int i = 0; i < NUM_IN; i++){
+			for (int j = 0; j < NUM_OUT; j++){
+				syn0[i][j] = (rand() % 10)/10.0;
+			}
+		}
+
+		/* Set up weights for syn1 */
+		for (int i = 0; i < NUM_HIDDEN; i++){
+			for (int j = 0; j < NUM_OUT; j++){
+				syn1[j][i] = (rand() % 10)/10.0;
+			}
+		}
+	} else {
+		/* Clears extraneous \n that has no been read in yet */
+		cin.getline(encryptedText, sizeof(encryptedText));
+
+		NUM_GEN = 1;
+	}
+	cout << "Enter the encrypted text: ";
 	cin.getline(encryptedText, sizeof(encryptedText));
 	srand(time(NULL));
 
-	/* Set up weights for syn0 and syn1*/
-	for (int i = 0; i < NUM_IN; i++){
-		for (int j = 0; j < NUM_OUT; j++){
-			syn0[i][j] = (rand() % 10)/10.0;
+}
+
+/**
+ *	Correctly sets the input values and target values (if training).
+ *	Also resets the values stored in the hidden nodes and the outNodes to 0 for the next iteration.
+ */
+void setUpInputs(int i) {
+	/********** SET UP INPUTS **********/
+
+	/* For each input character, we need to mask out the bits to see what inputs will be on or off */
+	mask = 1;
+	for (int j = 0; j < NUM_IN; j++){	
+		inputs[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
+
+		if (userMode == 1){
+     		target[j] = (plainText[i] & mask) == 0 ? 0 : 1;
+		}
+
+		mask = mask << 1;	//Shift mask over 1 to check for each bit 
+	}
+
+	/* Reset hidden Nodes and output nodes to be all 0. */
+	for (int j = 0; j < NUM_HIDDEN; j++){
+		hiddenNode[j] = 0;
+	}
+	for (int j = 0; j < NUM_OUT; j++){
+		outNode[j] = 0;
+	}
+}
+
+/**
+ *	Computes the values for the hidden layer, then the output layer.	
+ */
+void calculateOutputs(){
+	/********** CALCULATE OUTPUTS **********/
+
+	/* Iterates through hidden layer */
+	for (int j = 0; j < NUM_HIDDEN; j++){
+		/* Iterates through all synapses connecting to the jth hidden node */
+		for (int k = 0; k < NUM_IN; k++){
+			hiddenNode[j] += inputs[k] * syn0[k][j];
 		}
 	}
 
-	/* Set up weights for syn1 */
-	for (int i = 0; i < NUM_HIDDEN; i++){
-		for (int j = 0; j < NUM_OUT; j++){
-			syn1[j][i] = (rand() % 10)/10.0;
+	/* Iterates to find outputs */
+	for (int j = 0; j < NUM_OUT; j++){
+		/* Iterates through all synapses connecting to the jth output node */
+		for (int k = 0; k < NUM_HIDDEN; k++){
+			outNode[j] += sigmoid(hiddenNode[k]) * syn1[k][j];
 		}
 	}
+}
+/**
+ *	Computes the new weight values based on the error in the target values.
+ *	Only should be called in training mode.
+ */
+void backPropagation(){
+	/********** BACK PROPAGATION **********/
+
+	double finalError[NUM_OUT];
+  	/* Outputs are now calculated by this point. We now need to check against the target */
+  	for (int j = 0; j < NUM_OUT; j++){
+  		/* If the rounding of the output node (it gets rounded as per the output), equals the correct target, then say there is no error */
+  		if(target[j] == (int)floor(sigmoid(outNode[j]) + 0.5)){
+  			finalError[j] = 0;
+  		} else {
+    		finalError[j] = ((double)target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
+  		}
+  	}
+
+  	double newSyn1[NUM_HIDDEN][NUM_OUT];
+  	/* For every synapse, we must now change the weight to be finalError for its output node, times the hiddenLayer result and add that to the old synapse value. */
+  	for (int j = 0; j < NUM_OUT; j++){
+  		for (int k = 0; k < NUM_HIDDEN; k++){
+  			newSyn1[k][j] = syn1[k][j] + sigmoid(hiddenNode[k]) * finalError[j]; 
+  		}
+  	}
+
+  	double deltaHiddenSum[NUM_HIDDEN][NUM_OUT];
+  	/* Calculates the change in hidden sum by the last value */
+  	for (int j = 0; j < NUM_OUT; j++){
+  		for (int k = 0; k < NUM_HIDDEN; k++){
+  			deltaHiddenSum[k][j] = finalError[j] * syn1[k][j] * errorSigmoid(hiddenNode[k]);
+  		}
+  	}
+
+  	/* Set the new weights of the first synapses (input to hidden) */
+  	for (int j = 0; j < NUM_IN; j++){
+  		for (int k = 0; k < NUM_HIDDEN; k++){
+  			syn0[j][k] += deltaHiddenSum[k][j] * inputs[j];
+  		}
+  	}
+
+  	/* Now set syn1 to the new weights */
+  	for (int j = 0; j < NUM_HIDDEN; j++){
+  		for (int k = 0; k < NUM_OUT; k++){
+  			syn1[j][k] = newSyn1[j][k];
+  		}
+  	}
+
+}
+
+/**
+ *	Displays the result string based on the value of the output nodes.
+ */
+void showResult(){
+    /********** OUTPUT **********/
+
+  	int outValue = 0;
+  	/* Now, convert output back to ascii value */
+  	for (int j = 0; j < NUM_OUT; j++){
+  		/* We want the output value to be a 1 or 0. */
+  		outValue += (floor(sigmoid(outNode[j]) + 0.5) >= 1 ? 1 << j : 0);
+  	}
+  	sprintf(outString, "%s%c", outString, (char)outValue);
+}
+
+/**
+ *	For training mode only
+ *	Checks the result of the output nodes, and compares it to the plain text
+ *	Returns true when result matches
+ *	Should exit the training mode when this happens.
+ */
+bool checkResult(int currentGen){
+	/********** CHECK RESULT **********/
+
+    cout << outString;
+    if(strcmp(outString, plainText) == 0){
+
+    	cout << endl << "DECRYPTION FINISHED AFTER: " << currentGen << " GENERATIONS." << endl;
+    	return true;
+    }
+    /* Reset outString to blank for the next iteration */
+	strcpy(outString, "");
+	cout << endl;
+
+	return false;
 }
 
 double sigmoid(double x){
