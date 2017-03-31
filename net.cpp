@@ -36,6 +36,9 @@ double outNode[NUM_OUT];
 /* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
 char mask;
 
+/* A buffer of 100 generations that happens after it finds the right decryption, to make sure it is not a fluke/ trains itself more */
+int buffer = 100;
+
 char plainText[MAX_CHAR];
 char encryptedText[MAX_CHAR];
 
@@ -77,12 +80,18 @@ void mainLoop(){
 	      	showResult();
 		}
 
+    	cout << outString;
+
 		/* If checkResult returns true, it means the output matched the target, and we should exit the loop as training is now completed */
 		if(userMode == 1){
 			if(checkResult(z)){
 				break;
 			}
+		} else {
+			strcpy(outString, "");
 		}
+
+		cout << endl;
 	}
 }
 
@@ -273,15 +282,19 @@ void showResult(){
 bool checkResult(int currentGen){
 	/********** CHECK RESULT **********/
 
-    cout << outString;
     if(strcmp(outString, plainText) == 0){
+    	buffer--;
 
-    	cout << endl << "DECRYPTION FINISHED AFTER: " << currentGen << " GENERATIONS." << endl;
-    	return true;
+   		if (buffer == 0){
+    		cout << endl << "DECRYPTION FINISHED AFTER: " << currentGen - 100 << " GENERATIONS." << endl;
+    		strcpy(outString, "");
+    		return true;
+    	}
+    } else {
+    	buffer = 100;
     }
     /* Reset outString to blank for the next iteration */
 	strcpy(outString, "");
-	cout << endl;
 
 	return false;
 }
