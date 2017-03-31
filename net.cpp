@@ -18,21 +18,25 @@ using namespace std;
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
+int NUM_GEN;
+
 /* 0 if in using, 1 if in training */
 int userMode;
-
-int NUM_GEN;
 
 /* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
 int inputs[NUM_IN];
 int target[NUM_OUT];
+
 /* syn0 are the edges connecting the input nodes and the hidden layer */
 double syn0[NUM_IN][NUM_HIDDEN];
 double hiddenNode[NUM_HIDDEN];
+
 /* syn1 are the edges connecting the hidden layer node and the output nodes */
 double syn1[NUM_HIDDEN][NUM_OUT];
+
 /* The ouputs will be doubles, but will be cast to ints as the output, to get the ascii value */
 double outNode[NUM_OUT];
+
 /* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
 char mask;
 
@@ -45,6 +49,7 @@ double sigmoid(double x);
 double errorSigmoid(double x);
 void printNet();
 void mainLoop();
+void initSyn();
 int getUserMode();
 void init();
 void setUpInputs(int i);
@@ -55,14 +60,18 @@ bool checkResult(int currentGen);
 
 int main(){
 
+	initSyn();
+
 	/* Total loop that will repeatedly ask the user whether they want training or using, so they can train the net, then attempt to use it for another problem */
 	while (1){
+		
 		/* Asks the user what mode they would like to use, training or using */
 		userMode = getUserMode();
+
 		/* Gets user input, initializes the synapses to random values */
 		init();
 
-		/* Does the rest of the work of training/ using */
+		/* Does the rest of the work of training or using */
 		mainLoop();
 	}
 	return 0;
@@ -93,6 +102,24 @@ void mainLoop(){
 		}
 	}
 }
+/**
+ *	Sets random synapse values for the first execution only.
+ */
+void initSyn(){
+	/* Set up weights for syn0 and syn1*/
+	for (int i = 0; i < NUM_IN; i++){
+		for (int j = 0; j < NUM_OUT; j++){
+			syn0[i][j] = (rand() % 10)/10.0;
+		}
+	}
+
+	/* Set up weights for syn1 */
+	for (int i = 0; i < NUM_HIDDEN; i++){
+		for (int j = 0; j < NUM_OUT; j++){
+			syn1[j][i] = (rand() % 10)/10.0;
+		}
+	}
+}
 
 int getUserMode(){
 	cout << "Enter 0 to enter use mode, enter 1 to enter training mode: ";
@@ -114,8 +141,6 @@ int getUserMode(){
 }
 
 void init(){
-	
-
 
 	/* We only need the plain text for training mode. And we don't want to overwrite the current weights */
 	if (userMode == 1){
@@ -128,19 +153,6 @@ void init(){
 		cout << "Enter plain text up to " << MAX_CHAR << " characters: ";
 		cin.getline(plainText, sizeof(plainText));
 
-		/* Set up weights for syn0 and syn1*/
-		for (int i = 0; i < NUM_IN; i++){
-			for (int j = 0; j < NUM_OUT; j++){
-				syn0[i][j] = (rand() % 10)/10.0;
-			}
-		}
-
-		/* Set up weights for syn1 */
-		for (int i = 0; i < NUM_HIDDEN; i++){
-			for (int j = 0; j < NUM_OUT; j++){
-				syn1[j][i] = (rand() % 10)/10.0;
-			}
-		}
 	} else {
 		/* Clears extraneous \n that has no been read in yet */
 		cin.getline(encryptedText, sizeof(encryptedText));
