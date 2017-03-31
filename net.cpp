@@ -13,13 +13,13 @@ using namespace std;
  *	TODO: Save weights to a file
  */
 
-#define MAX_CHAR 10
+#define MAX_CHAR 100
 
 #define NUM_IN 7
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
-#define NUM_GEN 1000
+#define NUM_GEN 5000
 
 /* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
 int inputs[NUM_IN];
@@ -35,7 +35,7 @@ double outNode[NUM_OUT];
 char mask;
 
 
-char outString[10];
+char outString[MAX_CHAR];
 
 double sigmoid(double x);
 double errorSigmoid(double x);
@@ -44,11 +44,16 @@ void printNet();
 int main(){
 	char plainText[MAX_CHAR];
 	cout << "Enter plain text up to " << MAX_CHAR << " characters:";
-	cin >> plainText;
+	cin.getline(plainText, sizeof(plainText));
+	//cin >> plainText;
 
 	char encryptedText[MAX_CHAR];
 	cout << "Enter the encrypted text:";
-	cin >> encryptedText;
+	cin.getline(encryptedText, sizeof(encryptedText));
+	//cin >> encryptedText;
+	while(encryptedText[0] == '\n'){
+		cin >> encryptedText;
+	}
 	srand(time(NULL));
 
 
@@ -76,7 +81,7 @@ int main(){
 
 		/* For each input character, we need to mask out the bits to see what inputs will be on or off */
 		mask = 1;
-		for (int j = 0; j < 7; j++){	
+		for (int j = 0; j < NUM_IN; j++){	
 			inputs[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
          	target[j] = (plainText[i] & mask) == 0 ? 0 : 1;
 			mask = mask << 1;	//Shift mask over 1 to check for each bit 
@@ -108,12 +113,17 @@ int main(){
 			}
 		}
       
-      	/********** BACK PROPOGATION **********/
+      	/********** BACK PROPAGATION **********/
 
     	double finalError[NUM_OUT];
       	/* Outputs are now calculated by this point. We now need to check against the target */
       	for (int j = 0; j < NUM_OUT; j++){
-        	finalError[j] = (target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
+      		/* If the rounding of the output node (it gets rounded as per the output), equals the correct target, then say there is no error */
+      		if(target[j] != floor(sigmoid(outNode[j] + 0.5))){
+        		finalError[j] = ((double)target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
+      		} else {
+      			finalError[j] = 0;
+      		}
       	}
 
       	double newSyn1[NUM_HIDDEN][NUM_OUT];
