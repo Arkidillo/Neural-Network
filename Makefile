@@ -5,7 +5,7 @@ TARGET = net
 
 all: $(TARGET)
 
-$(TARGET): net.cpp
+$(TARGET): $(TARGET).cpp $(TARGET).h
 	$(CC) $(CFLAGS) net.cpp -o $(TARGET)
 	./net
 

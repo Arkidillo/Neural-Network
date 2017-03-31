@@ -5,18 +5,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <algorithm>
+
+#include "net.h"
 using namespace std;
 
 /** 
  *	TODO: Save weights to a file
  *	TODO: Populate shorter string with spaces to be same length
  */
-
-#define MAX_CHAR 1000
-
-#define NUM_IN 7
-#define NUM_HIDDEN 10
-#define NUM_OUT 7
 
 int NUM_GEN;
 
@@ -44,19 +40,6 @@ char plainText[MAX_CHAR];
 char encryptedText[MAX_CHAR];
 
 char outString[MAX_CHAR];
-
-double sigmoid(double x);
-double errorSigmoid(double x);
-void printNet();
-void mainLoop();
-void initSyn();
-int getUserMode();
-void init();
-void setUpInputs(int i);
-void calculateOutputs();
-void backPropagation();
-void showResult();
-bool checkResult(int currentGen);
 
 int main(){
 
@@ -102,6 +85,7 @@ void mainLoop(){
 		}
 	}
 }
+
 /**
  *	Sets random synapse values for the first execution only.
  */
