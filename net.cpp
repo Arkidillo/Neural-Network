@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <algorithm>
 using namespace std;
 
 /** 
@@ -11,6 +12,7 @@ using namespace std;
  *	TODO: Ask user for training/ using mode.
  *	TODO: Ask user for num_gen
  *	TODO: Save weights to a file
+ *	TODO: Populate shorter string with spaces to be same length
  */
 
 #define MAX_CHAR 1000
@@ -34,48 +36,28 @@ double outNode[NUM_OUT];
 /* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
 char mask;
 
+char plainText[MAX_CHAR];
+char encryptedText[MAX_CHAR];
 
 char outString[MAX_CHAR];
 
 double sigmoid(double x);
 double errorSigmoid(double x);
 void printNet();
+int getUserMode();
+void init();
 
 int main(){
-	char plainText[MAX_CHAR];
-	cout << "Enter plain text up to " << MAX_CHAR << " characters:";
-	cin.getline(plainText, sizeof(plainText));
-	//cin >> plainText;
-
-	char encryptedText[MAX_CHAR];
-	cout << "Enter the encrypted text:";
-	cin.getline(encryptedText, sizeof(encryptedText));
-	//cin >> encryptedText;
-	while(encryptedText[0] == '\n'){
-		cin >> encryptedText;
-	}
-	srand(time(NULL));
-
-
 	
-	/* Set up weights for syn0 and syn1*/
-	for (int i = 0; i < NUM_IN; i++){
-		for (int j = 0; j < NUM_OUT; j++){
-			syn0[i][j] = (rand() % 10)/10.0;
-		}
-	}
-
-	/* Set up weights for syn1 */
-	for (int i = 0; i < NUM_HIDDEN; i++){
-		for (int j = 0; j < NUM_OUT; j++){
-			syn1[j][i] = (rand() % 10)/10.0;
-		}
-	}
+	/* Asks the user what mode they would like to use, training or using */
+	getUserMode();
+	/* Gets user input, initializes the synapses to random values */
+	init();
 
 	/* Loop to repeat for each generation */
 	for (int z = 0; z < NUM_GEN; z++){
 	/* Main loop that goes through each character at a time. */
-	for (int i = 0; i < (int)strlen(encryptedText); i++){
+	for (int i = 0; i < max((int)strlen(encryptedText), (int)strlen(plainText)); i++){
 
 		/********** SET UP **********/
 
@@ -182,14 +164,53 @@ int main(){
 
 }
 
+int getUserMode(){
+	cout << "Enter 0 to enter use mode, enter 1 to enter training mode.";
+	int mode;
+	cin >> mode;
+
+	switch(mode){
+		case 0:
+			cout << "USING MODE SELECTED." << endl;
+			return mode;
+			break;
+		case 1:
+			cout << "TRAINING MODE SELECTED." << endl;
+			return mode;
+		default:
+			cout << "INVALID SELECTION." << endl;
+			return getUserMode();
+	}
+}
+
+void init(){
+	cin.getline(plainText, sizeof(plainText));
+	cout << "Enter plain text up to " << MAX_CHAR << " characters:";
+	cin.getline(plainText, sizeof(plainText));
+
+	cout << "Enter the encrypted text:";
+	cin.getline(encryptedText, sizeof(encryptedText));
+	srand(time(NULL));
+
+	/* Set up weights for syn0 and syn1*/
+	for (int i = 0; i < NUM_IN; i++){
+		for (int j = 0; j < NUM_OUT; j++){
+			syn0[i][j] = (rand() % 10)/10.0;
+		}
+	}
+
+	/* Set up weights for syn1 */
+	for (int i = 0; i < NUM_HIDDEN; i++){
+		for (int j = 0; j < NUM_OUT; j++){
+			syn1[j][i] = (rand() % 10)/10.0;
+		}
+	}
+}
+
 double sigmoid(double x){
 	return 1.0/(1.0 + exp(-1*x));
 }
 
 double errorSigmoid(double x){
 	return exp(x)/pow((exp(x) + 1), 2.0);
-}
-
-void printNet(){
-
 }
