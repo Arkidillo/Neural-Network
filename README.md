@@ -1,2 +1,2 @@
 # Neural-Network
-Neural network built in C++ to beat reCaptcha.
+Neural network built in C++ for decryption.

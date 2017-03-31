@@ -4,23 +4,21 @@
 #include <math.h>
 #include <string.h>
 using namespace std;
-/*#include "net.h"
 
-Net::Net(void){
-	for (int i = 0; i < 3; i++){
-		inputs[0] = new InNode();
-		hiddenNodes[0] = new HiddenNode();
-		
-	}
-}
-*/
+/** 
+ *	TODO: Modularize code
+ *	TODO: Ask user for training/ using mode.
+ *	TODO: Ask user for num_gen
+ *	TODO: Save weights to a file
+ */
+
 #define MAX_CHAR 10
 
 #define NUM_IN 7
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
-#define NUM_GEN 100
+#define NUM_GEN 5
 
 double sigmoid(double x);
 double errorSigmoid(double x);
@@ -66,7 +64,7 @@ int main(){
 	/* Loop to repeat for each generation */
 	for (int z = 0; z < NUM_GEN; z++){
 	/* Main loop that goes through each character at a time. */
-	for (int i = 0; i < strlen(encryptedText); i++){
+	for (int i = 0; i < (int)strlen(encryptedText); i++){
 
 		/* For each input character, we need to mask out the bits to see what inputs will be on or off */
 		mask = 1;
@@ -74,6 +72,14 @@ int main(){
 			inputs[j] = (plainText[i] & mask) == 0 ? 0 : 1;
          	target[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
 			mask = mask << 1;	//Shift mask over 1 to check for each bit 
+		}
+
+		/* Reset hidden Nodes and output nodes to be all 0. */
+		for (int j = 0; j < NUM_HIDDEN; j++){
+			hiddenNode[j] = 0;
+		}
+		for (int j = 0; j < NUM_OUT; j++){
+			outNode[j] = 0;
 		}
 
 
@@ -129,12 +135,13 @@ int main(){
       		}
       	}
 
-      	char outValue;
+      	int outValue = 0;
       	/* Now, convert output back to ascii value */
       	for (int j = 0; j < NUM_OUT; j++){
-      		outValue += outNode[j] * pow(2, j);
+      		/* We want the output value to be a 1 or 0, eventually it will converge to this. We use floor here to round 0.5 -> 1 and < 0.5 to 0. */
+      		outValue += (floor(outNode[j] + 0.5) >= 1 ? 1 << j : 0);
       	}
-      	cout << outValue;
+      	cout << (char)outValue;
 	}
 
 	cout << endl;
