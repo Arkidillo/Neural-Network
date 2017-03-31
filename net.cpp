@@ -3,6 +3,7 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 using namespace std;
 
 /** 
@@ -18,10 +19,27 @@ using namespace std;
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
-#define NUM_GEN 5
+#define NUM_GEN 1000
+
+/* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
+int inputs[NUM_IN];
+int target[NUM_OUT];
+/* syn0 are the edges connecting the input nodes and the hidden layer */
+double syn0[NUM_IN][NUM_HIDDEN];
+double hiddenNode[NUM_HIDDEN];
+/* syn1 are the edges connecting the hidden layer node and the output nodes */
+double syn1[NUM_HIDDEN][NUM_OUT];
+/* The ouputs will be doubles, but will be cast to ints as the output, to get the ascii value */
+double outNode[NUM_OUT];
+/* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
+char mask;
+
+
+char outString[10];
 
 double sigmoid(double x);
 double errorSigmoid(double x);
+void printNet();
 
 int main(){
 	char plainText[MAX_CHAR];
@@ -33,19 +51,7 @@ int main(){
 	cin >> encryptedText;
 	srand(time(NULL));
 
-	/* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
-	int inputs[NUM_IN];
-	int target[NUM_OUT];
-	/* syn0 are the edges connecting the input nodes and the hidden layer */
-	double syn0[NUM_IN][NUM_HIDDEN];
-	double hiddenNode[NUM_HIDDEN];
-	/* syn1 are the edges connecting the hidden layer node and the output nodes */
-	double syn1[NUM_HIDDEN][NUM_OUT];
-	/* The ouputs will be doubles, but will be cast to ints as the output, to get the ascii value */
-	double outNode[NUM_OUT];
 
-	/* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
-	char mask;
 	
 	/* Set up weights for syn0 and syn1*/
 	for (int i = 0; i < NUM_IN; i++){
@@ -66,11 +72,13 @@ int main(){
 	/* Main loop that goes through each character at a time. */
 	for (int i = 0; i < (int)strlen(encryptedText); i++){
 
+		/********** SET UP **********/
+
 		/* For each input character, we need to mask out the bits to see what inputs will be on or off */
 		mask = 1;
 		for (int j = 0; j < 7; j++){	
-			inputs[j] = (plainText[i] & mask) == 0 ? 0 : 1;
-         	target[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
+			inputs[j] = (encryptedText[i] & mask) == 0 ? 0 : 1;
+         	target[j] = (plainText[i] & mask) == 0 ? 0 : 1;
 			mask = mask << 1;	//Shift mask over 1 to check for each bit 
 		}
 
@@ -82,6 +90,7 @@ int main(){
 			outNode[j] = 0;
 		}
 
+		/********** CALCULATE OUTPUTS **********/
 
 		/* Iterates through hidden layer */
 		for (int j = 0; j < NUM_HIDDEN; j++){
@@ -89,7 +98,7 @@ int main(){
 			for (int k = 0; k < NUM_IN; k++){
 				hiddenNode[j] += inputs[k] * syn0[k][j];
 			}
-         }
+		}
 
 		/* Iterates to find outputs */
 		for (int j = 0; j < NUM_OUT; j++){
@@ -99,7 +108,9 @@ int main(){
 			}
 		}
       
-     	 double finalError[NUM_OUT];
+      	/********** BACK PROPOGATION **********/
+
+    	double finalError[NUM_OUT];
       	/* Outputs are now calculated by this point. We now need to check against the target */
       	for (int j = 0; j < NUM_OUT; j++){
         	finalError[j] = (target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
@@ -135,15 +146,26 @@ int main(){
       		}
       	}
 
+      	/********** OUTPUT **********/
+
       	int outValue = 0;
       	/* Now, convert output back to ascii value */
       	for (int j = 0; j < NUM_OUT; j++){
       		/* We want the output value to be a 1 or 0, eventually it will converge to this. We use floor here to round 0.5 -> 1 and < 0.5 to 0. */
       		outValue += (floor(outNode[j] + 0.5) >= 1 ? 1 << j : 0);
       	}
-      	cout << (char)outValue;
+      	//cout << (char)outValue;
+      	sprintf(outString, "%s%c", outString, (char)outValue);
 	}
 
+    cout << outString;
+    if(strcmp(outString, plainText) == 0){
+
+    	cout << endl << "DECRYPTION FINISHED AFTER: " << z << " GENERATIONS." << endl;
+    	return 0;
+    }
+    /* Reset outString to blank for the next iteration */
+	strcpy(outString, "");
 	cout << endl;
 }
 	return 0;
@@ -156,4 +178,8 @@ double sigmoid(double x){
 
 double errorSigmoid(double x){
 	return exp(x)/pow((exp(x) + 1), 2.0);
+}
+
+void printNet(){
+
 }
