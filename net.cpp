@@ -11,7 +11,7 @@ using namespace std;
 
 /** 
  *	TODO: Save weights to a file
- *	TODO: Populate shorter string with spaces to be same length
+ *	TODO: Make static training method to train it against many caesar cipher examples
  */
 
 int NUM_GEN;
@@ -56,6 +56,7 @@ int main(){
 
 		/* Gets user input, initializes the synapses to random values */
 		init();
+		populateShorterString();
 
 		/* Does the rest of the work of training or using */
 		mainLoop();
@@ -92,6 +93,18 @@ void mainLoop(){
 		}
 
 		cout << endl;
+	}
+}
+
+/**
+ *	Populates the shorter string with spaces, so encrytion/ decryption will still work.
+ */
+void populateShorterString(){
+	char* shorter = strlen(encryptedText) > strlen(plainText) ? plainText : encryptedText;
+	char* longer = strlen(encryptedText) < strlen(plainText) ? plainText : encryptedText;
+
+	for (int i = strlen(shorter); i < strlen(longer); i++){
+		shorter[i] = ' ';
 	}
 }
 
