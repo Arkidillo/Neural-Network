@@ -119,11 +119,11 @@ int main(){
       	/* Outputs are now calculated by this point. We now need to check against the target */
       	for (int j = 0; j < NUM_OUT; j++){
       		/* If the rounding of the output node (it gets rounded as per the output), equals the correct target, then say there is no error */
-      		//if(target[j] != floor(sigmoid(outNode[j] + 0.5))){
+      		if(target[j] == (int)floor(outNode[j] + 0.5)){
+      			finalError[j] = 0;
+      		} else {
         		finalError[j] = ((double)target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
-      		//} else {
-      		//	finalError[j] = 0;
-      		//}
+      		}
       	}
 
       	double newSyn1[NUM_HIDDEN][NUM_OUT];
