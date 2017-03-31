@@ -13,13 +13,13 @@ using namespace std;
  *	TODO: Save weights to a file
  */
 
-#define MAX_CHAR 100
+#define MAX_CHAR 1000
 
 #define NUM_IN 7
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
-#define NUM_GEN 5000
+#define NUM_GEN 1000000
 
 /* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
 int inputs[NUM_IN];
@@ -119,7 +119,7 @@ int main(){
       	/* Outputs are now calculated by this point. We now need to check against the target */
       	for (int j = 0; j < NUM_OUT; j++){
       		/* If the rounding of the output node (it gets rounded as per the output), equals the correct target, then say there is no error */
-      		if(target[j] == (int)floor(outNode[j] + 0.5)){
+      		if(target[j] == (int)floor(sigmoid(outNode[j]) + 0.5)){
       			finalError[j] = 0;
       		} else {
         		finalError[j] = ((double)target[j] - sigmoid(outNode[j])) * errorSigmoid(outNode[j]);
@@ -162,7 +162,7 @@ int main(){
       	/* Now, convert output back to ascii value */
       	for (int j = 0; j < NUM_OUT; j++){
       		/* We want the output value to be a 1 or 0, eventually it will converge to this. We use floor here to round 0.5 -> 1 and < 0.5 to 0. */
-      		outValue += (floor(outNode[j] + 0.5) >= 1 ? 1 << j : 0);
+      		outValue += (floor(sigmoid(outNode[j]) + 0.5) >= 1 ? 1 << j : 0);
       	}
       	//cout << (char)outValue;
       	sprintf(outString, "%s%c", outString, (char)outValue);
