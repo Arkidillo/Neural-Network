@@ -14,7 +14,7 @@ using namespace std;
 
 /** 
  *	TODO: Save weights to a file
- *	TODO: Make static training method to train it against many caesar cipher examples
+ *	TODO: Add a seconds hidden layer
  */
 
 int NUM_GEN;
@@ -351,7 +351,7 @@ bool checkResult(int currentGen){
     		buffer = 100;
     		return true;
     	}
-    	
+
     } else {
     	buffer = 100;
     }
