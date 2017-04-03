@@ -13,7 +13,7 @@
 using namespace std;
 
 /** 
- *	TODO: Save weights to a file
+ *	TODO: Save weights to a file (enter 3 to save, 4 to load)
  *	TODO: Add a seconds hidden layer
  */
 
