@@ -49,6 +49,7 @@ char outString[MAX_CHAR];
 
 int main(){
 
+	srand(time(NULL));	
 
 	initSyn();
 
@@ -58,10 +59,14 @@ int main(){
 		/* Asks the user what mode they would like to use, training or using */
 		userMode = getUserMode();
 
-		/* Gets user input, initializes the synapses to random values */
-		init();
-		populateShorterString();
+		if(userMode == 2){
+			caesarTrainingMode();
+		} else {
 
+			/* Gets user input, initializes the synapses to random values */
+			init();
+			populateShorterString();
+		}
 		/* Does the rest of the work of training or using */
 		mainLoop();
 	}
@@ -101,6 +106,36 @@ void mainLoop(){
 }
 
 /**
+ *	Repeatedly runs the training mode with randomized strings from caesarTrainer class.
+ */
+void caesarTrainingMode(){
+	/* Holds how many different random strings to test */
+	int numTrials;
+
+	cout << "Enter number of random strings to test: " << endl;
+	cin >> numTrials;
+
+	/* Default num_gen to 100,000 */
+	NUM_GEN = 100000;
+
+	/* For the test of the program, we can treat the mode as if it is training */
+	userMode = 1;
+
+	CaesarTrainer cTrainer;
+	for (int i = 0; i < numTrials; i++){
+		/* Set up plain text and ecrypted text based on caesarTrainer functions */
+		cTrainer.createPlainText(plainText);
+		cout << "Plain text: " << plainText << endl;
+
+		cTrainer.encryptStr(encryptedText, plainText);
+		cout << "Encrypted text: " << encryptedText << endl;
+
+		mainLoop();
+	}
+}
+
+
+/**
  *	Populates the shorter string with spaces, so encrytion/ decryption will still work.
  */
 void populateShorterString(){
@@ -132,7 +167,11 @@ void initSyn(){
 }
 
 int getUserMode(){
-	cout << "Enter 0 to enter use mode, enter 1 to enter training mode: ";
+	cout << "Enter a command: " << endl;
+	cout << "\t0: Using mode " << endl;
+	cout << "\t1: Training mode " << endl;
+	cout << "\t2: Caesar training mode " << endl;
+
 	int mode;
 	cin >> mode;
 
@@ -140,16 +179,20 @@ int getUserMode(){
 		case 0:
 			cout << "USING MODE SELECTED." << endl;
 			return mode;
-			break;
 		case 1:
 			cout << "TRAINING MODE SELECTED." << endl;
+			return mode;
+		case 2:
+			cout << "CAESAR TRAINING MODE SELECTED." << endl;
 			return mode;
 		default:
 			cout << "INVALID SELECTION." << endl;
 			return getUserMode();
 	}
 }
-
+/**
+ *	TODO: Split this to a different function per each mode, and check if in main before calling the function.
+ */
 void init(){
 
 	/* We only need the plain text for training mode. And we don't want to overwrite the current weights */
@@ -169,9 +212,9 @@ void init(){
 
 		NUM_GEN = 1;
 	}
+
 	cout << "Enter the encrypted text: ";
 	cin.getline(encryptedText, sizeof(encryptedText));
-	srand(time(NULL));
 
 }
 

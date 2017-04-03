@@ -12,6 +12,11 @@ void printNet();
 void mainLoop();
 
 /**
+ *	Repeatedly runs the training mode with randomized strings from caesarTrainer class.
+ */
+void caesarTrainingMode();
+
+/**
  *	Populates the shorter string with spaces, so encrytion/ decryption will still work.
  */
 void populateShorterString();

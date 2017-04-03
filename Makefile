@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -Wall -O
+CFLAGS = -g -Wall -O2
 
 TARGET = net
 
