@@ -7,6 +7,9 @@
 #include <algorithm>
 
 #include "net.h"
+#include "synapseIO.h"
+#include "caesarTrainer.h"
+
 using namespace std;
 
 /** 
@@ -45,6 +48,7 @@ char encryptedText[MAX_CHAR];
 char outString[MAX_CHAR];
 
 int main(){
+
 
 	initSyn();
 

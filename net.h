@@ -7,6 +7,7 @@
 #define NUM_HIDDEN 10
 #define NUM_OUT 7
 
+
 void printNet();
 void mainLoop();
 
