@@ -8,7 +8,6 @@
 #define NUM_OUT 7
 
 
-void printNet();
 void mainLoop();
 
 /**

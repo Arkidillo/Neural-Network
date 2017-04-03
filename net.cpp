@@ -66,9 +66,10 @@ int main(){
 			/* Gets user input, initializes the synapses to random values */
 			init();
 			populateShorterString();
+			
+			/* Does the rest of the work of training or using */
+			mainLoop();
 		}
-		/* Does the rest of the work of training or using */
-		mainLoop();
 	}
 	return 0;
 
@@ -343,17 +344,10 @@ bool checkResult(int currentGen){
 	/********** CHECK RESULT **********/
 
     if(strcmp(outString, plainText) == 0){
-    	buffer--;
+		cout << endl << "DECRYPTION FINISHED AFTER: " << currentGen << " GENERATIONS." << endl;
+		strcpy(outString, "");
+		return true;
 
-   		if (buffer == 0){
-    		cout << endl << "DECRYPTION FINISHED AFTER: " << currentGen - 100 << " GENERATIONS." << endl;
-    		strcpy(outString, "");
-    		buffer = 100;
-    		return true;
-    	}
-
-    } else {
-    	buffer = 100;
     }
     /* Reset outString to blank for the next iteration */
 	strcpy(outString, "");
