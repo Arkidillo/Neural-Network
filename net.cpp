@@ -348,8 +348,10 @@ bool checkResult(int currentGen){
    		if (buffer == 0){
     		cout << endl << "DECRYPTION FINISHED AFTER: " << currentGen - 100 << " GENERATIONS." << endl;
     		strcpy(outString, "");
+    		buffer = 100;
     		return true;
     	}
+    	
     } else {
     	buffer = 100;
     }
