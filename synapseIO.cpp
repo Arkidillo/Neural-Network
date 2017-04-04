@@ -15,7 +15,7 @@ using namespace std;
  *	Function that saves the given synapse arrays to a text file
  *	(using space as a separator)
  */
-void saveSynapse(double** syn0, double** syn1, double** syn2){
+void saveSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double syn2[][NUM_OUT]){
 	ofstream syn0Stream;
 	ofstream syn1Stream;
 	ofstream syn2Stream;
@@ -60,7 +60,7 @@ void saveSynapse(double** syn0, double** syn1, double** syn2){
 /**
  *	Loads the synapses from the file to the arrays passed in
  */
-void loadSynapse(double** syn0, double** syn1, double** syn2){
+void loadSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double syn2[][NUM_OUT]){
 	ifstream syn0Stream;
 	ifstream syn1Stream;
 	ifstream syn2Stream;

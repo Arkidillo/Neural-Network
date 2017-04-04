@@ -75,6 +75,12 @@ int main(){
 			case 2:
 				caesarTrainingMode();
 				break;
+			case 3:
+				loadSynapse(syn0, syn1, syn2);
+				break;
+			case 4:
+				saveSynapse(syn0, syn1, syn2);
+				break;
 		}
 	}
 	return 0;
@@ -178,7 +184,9 @@ int getUserMode(){
 	cout << "\t0: Using mode " << endl;
 	cout << "\t1: Training mode " << endl;
 	cout << "\t2: Caesar training mode " << endl;
-
+	cout << "\t3: Load synapses" << endl;
+	cout << "\t4: Save synapses" << endl;
+	
 	int mode;
 	cin >> mode;
 
@@ -191,6 +199,12 @@ int getUserMode(){
 			return mode;
 		case 2:
 			cout << "CAESAR TRAINING MODE SELECTED." << endl;
+			return mode;
+		case 3:
+			cout << "LOADING SYNAPSES." << endl;
+			return mode;
+		case 4:
+			cout << "SAVING SYNAPSES." << endl;
 			return mode;
 		default:
 			cout << "INVALID SELECTION." << endl;
