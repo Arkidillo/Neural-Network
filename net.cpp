@@ -71,7 +71,6 @@ int main(){
 				initTrain();
 				mainLoop();
 				break;
-
 			case 2:
 				caesarTrainingMode();
 				break;
@@ -186,6 +185,7 @@ int getUserMode(){
 	cout << "\t2: Caesar training mode " << endl;
 	cout << "\t3: Load synapses" << endl;
 	cout << "\t4: Save synapses" << endl;
+	cout << "\t5: Exit" << endl;
 	
 	int mode;
 	cin >> mode;
@@ -206,6 +206,9 @@ int getUserMode(){
 		case 4:
 			cout << "SAVING SYNAPSES." << endl;
 			return mode;
+		case 5:
+			cout << "EXITING" << endl;
+			exit(0);
 		default:
 			cout << "INVALID SELECTION." << endl;
 			return getUserMode();
@@ -375,7 +378,7 @@ void backPropagation(){
   		}
   	}
   	for (int j = 0; j < NUM_HIDDEN; j++){
-  		for (int k = 0; k < NUM_OUT; k++){
+  		for (int k = 0; k < NUM_HIDDEN; k++){
   			syn1[j][k] = newSyn1[j][k];
   		}
   	}

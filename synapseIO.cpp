@@ -69,7 +69,7 @@ void loadSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double sy
 	vector<string> tokens;
 	char* tokEnd;
 
-	int j = 0;
+	int i = 0;
 
 	syn0Stream.open(SYN0_FILE);
 	while(getline(syn0Stream, line)){
@@ -79,15 +79,16 @@ void loadSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double sy
 		cArr[line.size()] = '\n';
 		
 
-		syn0[0][j] = strtod(cArr, &tokEnd);
+		syn0[i][0] = strtod(cArr, &tokEnd);
 		
-		for (int i = 1; i < NUM_HIDDEN; i++){
+		for (int j = 1; j < NUM_HIDDEN; j++){
 			syn0[i][j] = strtod(tokEnd, &tokEnd);
 		}
 
-		j++;
+		i++;
 	}
 
+	i = 0;
 	syn0Stream.close();
 	syn1Stream.open(SYN1_FILE);
 	while(getline(syn1Stream, line)){
@@ -97,15 +98,16 @@ void loadSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double sy
 		cArr[line.size()] = '\n';
 		
 
-		syn0[0][j] = strtod(cArr, &tokEnd);
+		syn0[i][0] = strtod(cArr, &tokEnd);
 		
-		for (int i = 1; i < NUM_HIDDEN; i++){
+		for (int j = 1; j < NUM_HIDDEN; j++){
 			syn1[i][j] = strtod(tokEnd, &tokEnd);
 		}
 
-		j++;
+		i++;
 	}
 
+	i = 0;
 	syn1Stream.close();
 	syn2Stream.open(SYN2_FILE);
 	while(getline(syn2Stream, line)){
@@ -115,13 +117,13 @@ void loadSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double sy
 		cArr[line.size()] = '\n';
 		
 
-		syn0[0][j] = strtod(cArr, &tokEnd);
+		syn0[i][0] = strtod(cArr, &tokEnd);
 		
-		for (int i = 1; i < NUM_OUT; i++){
+		for (int j = 1; j < NUM_OUT; j++){
 			syn2[i][j] = strtod(tokEnd, &tokEnd);
 		}
 
-		j++;
+		i++;
 	}
 
 	syn2Stream.close();
