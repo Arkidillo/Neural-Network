@@ -20,11 +20,25 @@ void caesarTrainingMode();
  */
 void initSyn();
 
-//TODO: Add comment
+/**
+ *	Asks the user if they want (returns the number):
+ *	0: Using
+ *	1: Training
+ *	2: CaesarTraining
+ */
 int getUserMode();
 
-//TODO: Add comment
-void init();
+/**
+ *	Asks user for plain text,
+ *	encrypted text,
+ *	and number of generations
+ */
+void initTrain();
+
+/**
+ *	Asks user for encrypted text
+ */
+void initUse();
 
 /**
  *	Correctly sets the input values and target values (if training).

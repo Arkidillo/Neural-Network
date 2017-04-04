@@ -14,6 +14,7 @@ using namespace std;
 
 /** 
  *	TODO: Save weights to a file (enter 3 to save, 4 to load)
+ *	TODO: Multithread?
  */
 
 int NUM_GEN;
@@ -54,23 +55,22 @@ int main(){
 
 	srand(time(NULL));	
 
+	/* Initializes the synapses to random values */
 	initSyn();
 
 	/* Total loop that will repeatedly ask the user whether they want training or using, so they can train the net, then attempt to use it for another problem */
 	while (1){
 		
 		/* Asks the user what mode they would like to use, training or using */
-		userMode = getUserMode();
+		switch(getUserMode()){
+			case 0:
+			case 1:
+				init();
+				mainLoop();
+				break;
 
-		if(userMode == 2){
-			caesarTrainingMode();
-		} else {
-
-			/* Gets user input, initializes the synapses to random values */
-			init();
-
-			/* Does the rest of the work of training or using */
-			mainLoop();
+			case 2:
+				caesarTrainingMode();
 		}
 	}
 	return 0;
@@ -163,6 +163,12 @@ void initSyn(){
 	}
 }
 
+/**
+ *	Asks the user if they want (returns the number):
+ *	0: Using
+ *	1: Training
+ *	2: CaesarTraining
+ */
 int getUserMode(){
 	cout << "Enter a command: " << endl;
 	cout << "\t0: Using mode " << endl;
@@ -187,29 +193,39 @@ int getUserMode(){
 			return getUserMode();
 	}
 }
+
 /**
- *	TODO: Split this to a different function per each mode, and check if in main before calling the function.
+ *	Asks user for plain text,
+ *	encrypted text,
+ *	and number of generations
  */
-void init(){
+void initTrain(){
 
 	/* We only need the plain text for training mode. And we don't want to overwrite the current weights */
-	if (userMode == 1){
-		/* We only need to use the NUM_GEN in triaining, because in using, the output will always be the same because there is no weight change. Thus, we only need 1 GEN. */
-		cout << "Enter number of generations: " << endl;
-		cin >> NUM_GEN;
-		
-		/* Clears extraneous \n that has no been read in yet */
-		cin.getline(plainText, sizeof(plainText));
-		cout << "Enter plain text up to " << MAX_CHAR << " characters: ";
-		cin.getline(plainText, sizeof(plainText));
+	cout << "Enter number of generations: " << endl;
+	cin >> NUM_GEN;
+	
+	/* Clears extraneous \n that has no been read in yet */
+	cin.getline(plainText, sizeof(plainText));
+	cout << "Enter plain text up to " << MAX_CHAR << " characters: ";
+	cin.getline(plainText, sizeof(plainText));
 
-	} else {
-		/* Clears extraneous \n that has no been read in yet */
-		cin.getline(encryptedText, sizeof(encryptedText));
 
-		NUM_GEN = 1;
-	}
+	cout << "Enter the encrypted text: ";
+	cin.getline(encryptedText, sizeof(encryptedText));
 
+}
+
+/**
+ *	Asks user for encrypted text
+ */
+void initUse(){
+
+	/* Clears extraneous \n that has no been read in yet */
+	cin.getline(encryptedText, sizeof(encryptedText));
+
+	NUM_GEN = 1;
+	
 	cout << "Enter the encrypted text: ";
 	cin.getline(encryptedText, sizeof(encryptedText));
 
