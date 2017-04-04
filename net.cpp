@@ -28,10 +28,14 @@ int target[NUM_OUT];
 
 /* syn0 are the edges connecting the input nodes and the hidden layer */
 double syn0[NUM_IN][NUM_HIDDEN];
-double hiddenNode[NUM_HIDDEN];
+double hiddenNode1[NUM_HIDDEN];
 
-/* syn1 are the edges connecting the hidden layer node and the output nodes */
+/* syn1 are the edges connecting the first and second hidden layers */
 double syn1[NUM_HIDDEN][NUM_OUT];
+double hiddenNode2[NUM_HIDDEN];
+
+/* syn2 are the edges connecting the second hiddenlayer and the output layer */
+double syn2[NUM_HIDDEN][NUM_OUT];
 
 /* The ouputs will be doubles, but will be cast to ints as the output, to get the ascii value */
 double outNode[NUM_OUT];
@@ -65,8 +69,7 @@ int main(){
 
 			/* Gets user input, initializes the synapses to random values */
 			init();
-			populateShorterString();
-			
+
 			/* Does the rest of the work of training or using */
 			mainLoop();
 		}
@@ -135,24 +138,11 @@ void caesarTrainingMode(){
 	}
 }
 
-
-/**
- *	Populates the shorter string with spaces, so encrytion/ decryption will still work.
- */
-void populateShorterString(){
-	char* shorter = strlen(encryptedText) > strlen(plainText) ? plainText : encryptedText;
-	char* longer = strlen(encryptedText) < strlen(plainText) ? plainText : encryptedText;
-
-	for (int i = strlen(shorter); i < strlen(longer); i++){
-		shorter[i] = ' ';
-	}
-}
-
 /**
  *	Sets random synapse values for the first execution only.
  */
 void initSyn(){
-	/* Set up weights for syn0 and syn1*/
+	/* Set up weights for syn0 */
 	for (int i = 0; i < NUM_IN; i++){
 		for (int j = 0; j < NUM_OUT; j++){
 			syn0[i][j] = (rand() % 10)/10.0;
@@ -161,8 +151,15 @@ void initSyn(){
 
 	/* Set up weights for syn1 */
 	for (int i = 0; i < NUM_HIDDEN; i++){
-		for (int j = 0; j < NUM_OUT; j++){
+		for (int j = 0; j < NUM_HIDDEN; j++){
 			syn1[j][i] = (rand() % 10)/10.0;
+		}
+	}
+
+	/* Set up weights for syn2 */
+	for (int i = 0; i < NUM_HIDDEN; i++){
+		for (int j = 0; j < NUM_OUT; j++){
+			syn2[j][i] = (rand() % 10)/10.0;
 		}
 	}
 }
@@ -240,7 +237,8 @@ void setUpInputs(int i) {
 
 	/* Reset hidden Nodes and output nodes to be all 0. */
 	for (int j = 0; j < NUM_HIDDEN; j++){
-		hiddenNode[j] = 0;
+		hiddenNode1[j] = 0;
+		hiddenNode2[j] = 0;
 	}
 	for (int j = 0; j < NUM_OUT; j++){
 		outNode[j] = 0;
@@ -253,11 +251,18 @@ void setUpInputs(int i) {
 void calculateOutputs(){
 	/********** CALCULATE OUTPUTS **********/
 
-	/* Iterates through hidden layer */
+	/* Iterates through hidden layer1 */
 	for (int j = 0; j < NUM_HIDDEN; j++){
 		/* Iterates through all synapses connecting to the jth hidden node */
 		for (int k = 0; k < NUM_IN; k++){
-			hiddenNode[j] += inputs[k] * syn0[k][j];
+			hiddenNode1[j] += inputs[k] * syn0[k][j];
+		}
+	}
+
+	/* Iterates through hidden layer2 */
+	for (int j = 0; j < NUM_HIDDEN; j++){
+		for (int k = 0; k < NUM_HIDDEN; k++){
+			hiddenNode2[j] += sigmoid(hiddenNode1[k]) * syn1[k][j];
 		}
 	}
 
@@ -265,7 +270,7 @@ void calculateOutputs(){
 	for (int j = 0; j < NUM_OUT; j++){
 		/* Iterates through all synapses connecting to the jth output node */
 		for (int k = 0; k < NUM_HIDDEN; k++){
-			outNode[j] += sigmoid(hiddenNode[k]) * syn1[k][j];
+			outNode[j] += sigmoid(hiddenNode2[k]) * syn1[k][j];
 		}
 	}
 }
@@ -287,30 +292,54 @@ void backPropagation(){
   		}
   	}
 
-  	double newSyn1[NUM_HIDDEN][NUM_OUT];
+  	double newSyn2[NUM_HIDDEN][NUM_OUT];
   	/* For every synapse, we must now change the weight to be finalError for its output node, times the hiddenLayer result and add that to the old synapse value. */
   	for (int j = 0; j < NUM_OUT; j++){
   		for (int k = 0; k < NUM_HIDDEN; k++){
-  			newSyn1[k][j] = syn1[k][j] + sigmoid(hiddenNode[k]) * finalError[j]; 
+  			newSyn2[k][j] = syn2[k][j] + sigmoid(hiddenNode2[k]) * finalError[j]; 
   		}
   	}
 
-  	double deltaHiddenSum[NUM_HIDDEN][NUM_OUT];
-  	/* Calculates the change in hidden sum by the last value */
+  	double deltaHiddenSum2[NUM_HIDDEN];
+  	/* Calculates the change in hidden sum2 by the last value */
   	for (int j = 0; j < NUM_OUT; j++){
   		for (int k = 0; k < NUM_HIDDEN; k++){
-  			deltaHiddenSum[k][j] = finalError[j] * syn1[k][j] * errorSigmoid(hiddenNode[k]);
+  			deltaHiddenSum2[k] += finalError[j] * syn2[k][j] * errorSigmoid(hiddenNode2[k]);
+  		}
+  	}
+
+  	double newSyn1[NUM_HIDDEN][NUM_HIDDEN];
+  	/*
+  	 * Set the new weights of the first synapses (input to hidden) 
+  	 * Similar to first newSyn2, but instead of having the finalError as our error margin, we have deltaHiddenSum2 as our error margin
+  	 */
+  	for (int j = 0; j < NUM_HIDDEN; j++){
+  		for (int k = 0; k < NUM_HIDDEN; k++){
+  			newSyn1[j][k] = syn1[j][k] +  sigmoid(hiddenNode1[j]) * deltaHiddenSum2[k];
+  		}
+  	}
+
+	double deltaHiddenSum1[NUM_HIDDEN];
+  	/* Calculates the change in hidden sum1 by the last value */
+  	for (int j = 0; j < NUM_HIDDEN; j++){
+  		for (int k = 0; k < NUM_HIDDEN; k++){
+  			deltaHiddenSum1[j] += deltaHiddenSum2[j] * syn1[k][j] * errorSigmoid(hiddenNode1[k]);
   		}
   	}
 
   	/* Set the new weights of the first synapses (input to hidden) */
   	for (int j = 0; j < NUM_IN; j++){
   		for (int k = 0; k < NUM_HIDDEN; k++){
-  			syn0[j][k] += deltaHiddenSum[k][j] * inputs[j];
+  			syn0[j][k] += deltaHiddenSum1[k] * inputs[j];
   		}
   	}
 
-  	/* Now set syn1 to the new weights */
+  	/* Now set syn1 and syn2 to the new weights */
+  	for (int j = 0; j < NUM_HIDDEN; j++){
+  		for (int k = 0; k < NUM_OUT; k++){
+  			syn2[j][k] = newSyn2[j][k];
+  		}
+  	}
   	for (int j = 0; j < NUM_HIDDEN; j++){
   		for (int k = 0; k < NUM_OUT; k++){
   			syn1[j][k] = newSyn1[j][k];

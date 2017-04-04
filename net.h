@@ -16,11 +16,6 @@ void mainLoop();
 void caesarTrainingMode();
 
 /**
- *	Populates the shorter string with spaces, so encrytion/ decryption will still work.
- */
-void populateShorterString();
-
-/**
  *	Sets random synapse values for the first execution only.
  */
 void initSyn();
