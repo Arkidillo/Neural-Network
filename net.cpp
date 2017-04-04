@@ -14,7 +14,6 @@ using namespace std;
 
 /** 
  *	TODO: Save weights to a file (enter 3 to save, 4 to load)
- *	TODO: Add a seconds hidden layer
  */
 
 int NUM_GEN;
@@ -23,22 +22,22 @@ int NUM_GEN;
 int userMode;
 
 /* Input/ ouput nodes will be turned on according to the binary value of the ascii value of each letter */
-int inputs[NUM_IN];
-int target[NUM_OUT];
+int inputs[NUM_IN] = {0};
+int target[NUM_OUT] = {0};
 
 /* syn0 are the edges connecting the input nodes and the hidden layer */
-double syn0[NUM_IN][NUM_HIDDEN];
-double hiddenNode1[NUM_HIDDEN];
+double syn0[NUM_IN][NUM_HIDDEN] = {0};
+double hiddenNode1[NUM_HIDDEN] = {0};
 
 /* syn1 are the edges connecting the first and second hidden layers */
-double syn1[NUM_HIDDEN][NUM_OUT];
-double hiddenNode2[NUM_HIDDEN];
+double syn1[NUM_HIDDEN][NUM_OUT] = {0};
+double hiddenNode2[NUM_HIDDEN] = {0};
 
 /* syn2 are the edges connecting the second hiddenlayer and the output layer */
-double syn2[NUM_HIDDEN][NUM_OUT];
+double syn2[NUM_HIDDEN][NUM_OUT] = {0};
 
 /* The ouputs will be doubles, but will be cast to ints as the output, to get the ascii value */
-double outNode[NUM_OUT];
+double outNode[NUM_OUT] = {0};
 
 /* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
 char mask;
@@ -46,10 +45,10 @@ char mask;
 /* A buffer of 100 generations that happens after it finds the right decryption, to make sure it is not a fluke/ trains itself more */
 int buffer = 100;
 
-char plainText[MAX_CHAR];
-char encryptedText[MAX_CHAR];
+char plainText[MAX_CHAR] = {0};
+char encryptedText[MAX_CHAR] = {0};
 
-char outString[MAX_CHAR];
+char outString[MAX_CHAR] = {0};
 
 int main(){
 
@@ -152,14 +151,14 @@ void initSyn(){
 	/* Set up weights for syn1 */
 	for (int i = 0; i < NUM_HIDDEN; i++){
 		for (int j = 0; j < NUM_HIDDEN; j++){
-			syn1[j][i] = (rand() % 10)/10.0;
+			syn1[i][j] = (rand() % 10)/10.0;
 		}
 	}
 
 	/* Set up weights for syn2 */
 	for (int i = 0; i < NUM_HIDDEN; i++){
 		for (int j = 0; j < NUM_OUT; j++){
-			syn2[j][i] = (rand() % 10)/10.0;
+			syn2[i][j] = (rand() % 10)/10.0;
 		}
 	}
 }
@@ -270,7 +269,7 @@ void calculateOutputs(){
 	for (int j = 0; j < NUM_OUT; j++){
 		/* Iterates through all synapses connecting to the jth output node */
 		for (int k = 0; k < NUM_HIDDEN; k++){
-			outNode[j] += sigmoid(hiddenNode2[k]) * syn1[k][j];
+			outNode[j] += sigmoid(hiddenNode2[k]) * syn2[k][j];
 		}
 	}
 }
@@ -281,7 +280,7 @@ void calculateOutputs(){
 void backPropagation(){
 	/********** BACK PROPAGATION **********/
 
-	double finalError[NUM_OUT];
+	double finalError[NUM_OUT] = {0};
   	/* Outputs are now calculated by this point. We now need to check against the target */
   	for (int j = 0; j < NUM_OUT; j++){
   		/* If the rounding of the output node (it gets rounded as per the output), equals the correct target, then say there is no error */
@@ -292,7 +291,7 @@ void backPropagation(){
   		}
   	}
 
-  	double newSyn2[NUM_HIDDEN][NUM_OUT];
+  	double newSyn2[NUM_HIDDEN][NUM_OUT] = {0};
   	/* For every synapse, we must now change the weight to be finalError for its output node, times the hiddenLayer result and add that to the old synapse value. */
   	for (int j = 0; j < NUM_OUT; j++){
   		for (int k = 0; k < NUM_HIDDEN; k++){
@@ -300,7 +299,7 @@ void backPropagation(){
   		}
   	}
 
-  	double deltaHiddenSum2[NUM_HIDDEN];
+  	double deltaHiddenSum2[NUM_HIDDEN] = {0};
   	/* Calculates the change in hidden sum2 by the last value */
   	for (int j = 0; j < NUM_OUT; j++){
   		for (int k = 0; k < NUM_HIDDEN; k++){
@@ -308,7 +307,7 @@ void backPropagation(){
   		}
   	}
 
-  	double newSyn1[NUM_HIDDEN][NUM_HIDDEN];
+  	double newSyn1[NUM_HIDDEN][NUM_HIDDEN] = {0};
   	/*
   	 * Set the new weights of the first synapses (input to hidden) 
   	 * Similar to first newSyn2, but instead of having the finalError as our error margin, we have deltaHiddenSum2 as our error margin
@@ -319,7 +318,7 @@ void backPropagation(){
   		}
   	}
 
-	double deltaHiddenSum1[NUM_HIDDEN];
+	double deltaHiddenSum1[NUM_HIDDEN] = {0};
   	/* Calculates the change in hidden sum1 by the last value */
   	for (int j = 0; j < NUM_HIDDEN; j++){
   		for (int k = 0; k < NUM_HIDDEN; k++){
