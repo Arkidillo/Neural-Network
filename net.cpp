@@ -64,13 +64,17 @@ int main(){
 		/* Asks the user what mode they would like to use, training or using */
 		switch(getUserMode()){
 			case 0:
+				initUse();
+				mainLoop();
+				break;
 			case 1:
-				init();
+				initTrain();
 				mainLoop();
 				break;
 
 			case 2:
 				caesarTrainingMode();
+				break;
 		}
 	}
 	return 0;
@@ -289,6 +293,7 @@ void calculateOutputs(){
 		}
 	}
 }
+
 /**
  *	Computes the new weight values based on the error in the target values.
  *	Only should be called in training mode.

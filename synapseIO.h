@@ -3,15 +3,17 @@
 
 #define SYN0_FILE "synapse0.txt"
 #define SYN1_FILE "synapse1.txt"
+#define SYN2_FILE "synapse2.txt"
 
 /**
- *	Function that saves the given synapse arrays to a text file
+ *	Function that saves the given synapse arrays to a text file 
+ *	(using space as a separator)
  */
-void saveSynapse(int** syn0, int** syn1);
+void saveSynapse(double** syn0, double** syn1, double** syn2);
 
 /**
- *	Loads the synapses from the file to 
+ *	Loads the synapses from the file to the arrays passed in 
  */
-int loadSynapse(int*** syn0, int*** syn1);
+void loadSynapse(double** syn0, double** syn1, double** syn2);
 
 #endif
