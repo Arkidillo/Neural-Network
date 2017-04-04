@@ -31,7 +31,7 @@ double syn0[NUM_IN][NUM_HIDDEN] = {0};
 double hiddenNode1[NUM_HIDDEN] = {0};
 
 /* syn1 are the edges connecting the first and second hidden layers */
-double syn1[NUM_HIDDEN][NUM_OUT] = {0};
+double syn1[NUM_HIDDEN][NUM_HIDDEN] = {0};
 double hiddenNode2[NUM_HIDDEN] = {0};
 
 /* syn2 are the edges connecting the second hiddenlayer and the output layer */
