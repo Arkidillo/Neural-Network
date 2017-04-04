@@ -43,9 +43,6 @@ double outNode[NUM_OUT] = {0};
 /* Mask will mast out each bit of the input string to get which bits of the input nodes should be turned on */
 char mask;
 
-/* A buffer of 100 generations that happens after it finds the right decryption, to make sure it is not a fluke/ trains itself more */
-int buffer = 100;
-
 char plainText[MAX_CHAR] = {0};
 char encryptedText[MAX_CHAR] = {0};
 
@@ -152,7 +149,7 @@ void caesarTrainingMode(){
 void initSyn(){
 	/* Set up weights for syn0 */
 	for (int i = 0; i < NUM_IN; i++){
-		for (int j = 0; j < NUM_OUT; j++){
+		for (int j = 0; j < NUM_HIDDEN; j++){
 			syn0[i][j] = (rand() % 10)/10.0;
 		}
 	}
