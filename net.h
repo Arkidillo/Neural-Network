@@ -11,6 +11,12 @@
 void mainLoop();
 
 /**
+ *	Takes null characters (ascii = 0) in the given string to '@'
+ *	The purpose of this is so that the synapses don't have to change that much to account for null characters.
+ */
+void convertNull(char* str);
+
+/**
  *	Repeatedly runs the training mode with randomized strings from caesarTrainer class.
  */
 void caesarTrainingMode();
@@ -73,5 +79,6 @@ bool checkResult(int currentGen);
 //TODO: Add comments
 double sigmoid(double x);
 double errorSigmoid(double x);
+
 
 #endif
