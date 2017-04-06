@@ -271,16 +271,8 @@ void setUpInputs(int i) {
 		}
 
 		mask = mask << 1;	//Shift mask over 1 to check for each bit 
-
-		cout << inputs[j];
 	}
-
-	for (int j = 0; j < NUM_IN; j++){
-		cout << target[j];
-	}
-
-	cout << endl;
-
+	
 	/* Reset hidden Nodes and output nodes to be all 0. */
 	for (int j = 0; j < NUM_HIDDEN; j++){
 		hiddenNode1[j] = 0;
@@ -407,7 +399,6 @@ void showResult(){
   		/* We want the output value to be a 1 or 0. */
   		outValue += (floor(sigmoid(outNode[j]) + 0.5) >= 1 ? 1 << j : 0);
   	}
-  	cout << outValue;
   	sprintf(outString, "%s%c", outString, (char)outValue);
 }
 
