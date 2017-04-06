@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -Wall -O2
+CFLAGS = -g -Wall -O2 -ggdb
 
 TARGET = net
 
@@ -20,3 +20,4 @@ caesarTrainer: caesarTrainer.cpp caesarTrainer.h
 
 clean:
 	$(RM) *~ $(TARGET)
+	$(RM) *.o

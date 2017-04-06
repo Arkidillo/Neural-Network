@@ -90,6 +90,8 @@ void mainLoop(){
 
 	/* Loop to repeat for each generation */
 	for (int z = 0; z < NUM_GEN; z++){
+		cout << "plainText: " << plainText << endl;
+		cout << "encryptedText: " << encryptedText << endl;
 		/* Main loop that goes through each character at a time. */
 		for (int i = 0; i < (int)strlen(encryptedText); i++){
 			
@@ -204,6 +206,7 @@ void initSyn(){
  *	2: CaesarTraining
  *	3: Load synapses
  *	4: Save synapses
+ *	5: Exit
  */
 int getUserMode(){
 	cout << "Enter a command: " << endl;

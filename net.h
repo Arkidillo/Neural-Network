@@ -1,7 +1,7 @@
 #ifndef _NET_H_
 #define _NET_H_
 
-#define MAX_CHAR 1000
+#define MAX_CHAR 25
 
 #define NUM_IN 7
 #define NUM_HIDDEN 10
