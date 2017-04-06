@@ -76,19 +76,12 @@ void loadSynapse(double syn0[][NUM_HIDDEN], double syn1[][NUM_HIDDEN], double sy
 		char* cArr = new char[line.length() + 1];
 		copy(line.begin(), line.end(), cArr);
 		cArr[line.size()] = '\0';
-		cout << "ARRAY: " << endl;
-		cout << cArr << endl << endl;
 		
-		cout << "SYN VALUES: " << endl;
 		syn0[i][0] = strtod(cArr, &tokEnd);
-		cout << syn0[i][0] << " ";
 		
 		for (int j = 1; j < NUM_HIDDEN; j++){
 			syn0[i][j] = strtod(tokEnd, &tokEnd);
-			cout << syn0[i][j] << " ";
 		}
-
-		cout << endl << endl;
 
 		i++;
 	}
