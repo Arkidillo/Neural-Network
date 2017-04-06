@@ -59,7 +59,8 @@ int main(){
 	while (1){
 		
 		/* Asks the user what mode they would like to use, training or using */
-		switch(getUserMode()){
+		userMode = getUserMode();
+		switch(userMode){
 			case 0:
 				initUse();
 				mainLoop();
@@ -84,14 +85,9 @@ int main(){
 }
 
 void mainLoop(){
-	/* Convert null characters to character closer to the current set (@) */
-	convertNull(plainText);
-	convertNull(encryptedText);
 
 	/* Loop to repeat for each generation */
 	for (int z = 0; z < NUM_GEN; z++){
-		cout << "plainText: " << plainText << endl;
-		cout << "encryptedText: " << encryptedText << endl;
 		/* Main loop that goes through each character at a time. */
 		for (int i = 0; i < (int)strlen(encryptedText); i++){
 			
@@ -105,7 +101,6 @@ void mainLoop(){
 	      	showResult();
 		}
 
-		convertNull(outString);
     	cout << outString;
 
 		/* If checkResult returns true, it means the output matched the target, and we should exit the loop as training is now completed */
@@ -118,29 +113,6 @@ void mainLoop(){
 		}
 
 		cout << endl;
-	}
-}
-
-/**
- *	Takes null characters (ascii = 0) in the given string to '@', and if there are any '@', converts them to a null character
- *	The purpose of this is so that the synapses don't have to change that much to account for null characters.
- */
-void convertNull(char* str){
-	bool flag = false;
-	for (int i = 0; i < strlen(str); i++){
-		if(str[i] == 0){
-			str[i] = '@';
-			flag = true;
-		}
-	}
-
-	/* If there was an '' symbol found, then we must be converting from null's to @'s. If there were none found, we must be converting from @'s to nulls, so we continue to the second loop */
-	if (flag) return;
-
-	for (int i = 0; i < strlen(str); i++){
-		if(str[i] == '@'){
-			str[i] = 0;
-		}
 	}
 }
 
@@ -299,7 +271,15 @@ void setUpInputs(int i) {
 		}
 
 		mask = mask << 1;	//Shift mask over 1 to check for each bit 
+
+		cout << inputs[j];
 	}
+
+	for (int j = 0; j < NUM_IN; j++){
+		cout << target[j];
+	}
+
+	cout << endl;
 
 	/* Reset hidden Nodes and output nodes to be all 0. */
 	for (int j = 0; j < NUM_HIDDEN; j++){
@@ -427,6 +407,7 @@ void showResult(){
   		/* We want the output value to be a 1 or 0. */
   		outValue += (floor(sigmoid(outNode[j]) + 0.5) >= 1 ? 1 << j : 0);
   	}
+  	cout << outValue;
   	sprintf(outString, "%s%c", outString, (char)outValue);
 }
 
