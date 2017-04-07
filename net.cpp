@@ -52,11 +52,13 @@ int main(){
 
 	srand(time(NULL));	
 
-	/* Initializes the synapses to random values */
-	initSyn();
+	/* Initializes the synapses to random values (rn, set to automatically load from file) */
+	//initSyn();
 
 	/* Total loop that will repeatedly ask the user whether they want training or using, so they can train the net, then attempt to use it for another problem */
 	while (1){
+		/* Automatically loads saved synapses */
+		loadSynapse(syn0, syn1, syn2);
 		
 		/* Asks the user what mode they would like to use, training or using */
 		userMode = getUserMode();
@@ -68,6 +70,7 @@ int main(){
 			case 1:
 				initTrain();
 				mainLoop();
+				saveSynapse(syn0, syn1, syn2);
 				break;
 			case 2:
 				caesarTrainingMode();
@@ -106,6 +109,7 @@ void mainLoop(){
 		/* If checkResult returns true, it means the output matched the target, and we should exit the loop as training is now completed */
 		if(userMode == 1){
 			if(checkResult(z)){
+				saveSynapse(syn0, syn1, syn2);
 				break;
 			}
 		} else {
