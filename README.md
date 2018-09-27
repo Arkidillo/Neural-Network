@@ -1,2 +1,2 @@
 # Neural-Network
-Neural network built in C++ for decryption.
+Neural network built from scratch in C++ for decryption.
